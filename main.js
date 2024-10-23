@@ -43,7 +43,7 @@ async function Start_App(){
   try{ 
     qs("#rss-box").innerHTML = `<div class="flex-center flex-grow-1 gap-2 w-100"><div class="spinner-grow spinner-grow" role="status"><span class="visually-hidden"></span></div>מעדכן...</div>`;
     rssObj = await Get(url); Get_Data(); Goto_Page('page-main') }
-  catch{ Goto_Page('page-login')
+  catch{ Goto_Page('page-auth')
   }
 }
 function _Read_Key_File(f){

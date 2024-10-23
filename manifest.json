@@ -1,6 +1,6 @@
 {
-  "name": "MyRss",
-  "short_name": "My RSS",
+  "name": "Rss",
+  "short_name": "RSS",
   "start_url":".",
   "background_color": "#212429",
   "theme_color": "#212429",
