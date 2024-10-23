@@ -12,6 +12,7 @@
   <script defer src="main.js"></script>
   <title>Rss</title>
 </head>
+
 <body data-bs-theme="dark"> 
 <div class="app bg-body-tertiary">
 
@@ -27,7 +28,7 @@
 <template id="new-item">
   <div id="new-item-~i~" class="d-flex flex-column px-2 m-2 border border-2 rounded-4 bg-body-secondary">
     <img id="ti-~i~" class="flex-center rounded rounded-5 py-2 d-none" src="~Img~" style="max-height:250px; max-width:100%;"/>
-    <a class="~Color~" href="~Link~" target="_blank">~Title~</a>
+    <a href="~Link~" target="_blank">~Title~</a>
     <div class="d-flex justify-content-between">
       <small>~Date~</small>
       <small class="text-truncate">~Site~</small>
@@ -60,8 +61,17 @@
   </div>
 </template> 
 
-<!-- MAIN -->
-<section id="page-main" class="page flex-column">
+<!-- PAGE LOGIN -->
+<section id="page-login" class="pg page flex-column page-hide">
+  <div class="flex-column flex-center h-100 w-100 gap-3">
+    LOAD KEY FILE
+    <input id="key-file" type="file" class="d-none" accept="text.txt" onchange="_Read_Key_File(this)"/>
+    <label id="key-file-label" for="key-file" class="bi bi-upload"></label>
+  </div>`
+</section>
+
+<!-- PAGE MAIN -->
+<section id="page-main" class="pg page flex-column">
   <!-- MAIN HEADER -->
   <div id="main-header" class="flex-center gap-3 p-3 py-3 px-2 border-2 border-bottom bg-body-tertiary">
     <i class="bi bi-list" title="תפריט" onclick="SideBar()"></i>
