@@ -5,9 +5,6 @@
 //   .catch((err) => console.log ("sw NOT Registred !", err));
 // }
 
-// GLOBAL VARIABLES
-let rssObj, lsRss={}, rssData, rssFeeds, rssItems, lastRead, readAll, url, showRead
-
 // GLOBAL FUNCTIONS
 const cl = (txt) => console.log(txt);
 const qs = (el, parent = document) => parent.querySelector(el);
@@ -15,91 +12,90 @@ const qsAll = (el, parent = document) => [...parent.querySelectorAll(el)];
 const Getls = (ls) => JSON.parse(localStorage.getItem(ls))
 const Setls = (ls) => localStorage.setItem(ls, JSON.stringify(lsRss))
 window.onclick = function(event) { if (!event.target.matches('.dropdown-btn')) qsAll('.dropdown-content').map(i => i.classList.remove('dropdown-show')) }
+const ar = [1,2,4,6,8,10,12,18,24,48]; ar.map(i => qs(".dropdown-content").innerHTML += ` <div class="drop-item border-bottom pointer px-2 py-2" onclick="_GetItemsFromTime(${i})">לפני ${i} שעות</div>`)
+
+// GLOBAL VARIABLES
+let lsRss={}, rssObj={}, rssFeeds, rssItems, lastRead, lastUpdt, url
 
 // API FUNCTIONS
 const Get = async (url) => { const res = await fetch(url); const data = await res.json(); return data; } 
 const Post = async (url, payload) => {
   const myHeaders = new Headers(); myHeaders.append("Content-Type", "application/json");
-  await fetch(url, {method: "POST", body: JSON.stringify(payload), headers: myHeaders});
+  const res = await fetch(url, {method: "POST", body: JSON.stringify(payload), headers: myHeaders});
+  return res;
 }
-const Put = async (url, payload) => {
-  const myHeaders = new Headers(); myHeaders.append("Content-Type", "application/json");
-  await fetch(url, {method: "PUT", body: JSON.stringify(payload), headers: myHeaders});
-}
-const Delete = async(url, key) => { let res = await Get(url);  delete res[key]; await Post(url, res);}
 
 // ELEMENTS FUNCTIONS
 const Mask    = (pg) => qs("#"+pg).classList.toggle("mask-show")
 const SideBar = () => {Mask("sidebar"); qs(".sidebar").classList.toggle("sidebar-show");}
-const Goto_Page = (pg) => { qsAll('.pg').map(p =>p.classList.add('page-hide')); qs('#'+pg).classList.remove('page-hide') }
+const GotoPage = (pg) => { qsAll('.pg').map(p =>p.classList.add('page-hide')); qs('#'+pg).classList.remove('page-hide') }
 
 // START APP
-Start_App()
-async function Start_App(){
-  [1,2,4,6,8,10,12,18,24,48].map(i => qs(".dropdown-content").innerHTML += `
-    <div class="drop-item border-bottom pointer px-2 py-2" onclick="_Get_Items_From_Time(${i})">לפני ${i} שעות</div>`)
+StartApp()
+async function StartApp(){
   if (Getls("lsRss")==null) {lsRss.theme="dark"; lsRss.url=""; Setls('lsRss')}
   lsRss = Getls('lsRss'); url = lsRss.url; document.body.setAttribute("data-bs-theme", lsRss.theme); 
   try{ 
     qs("#rss-box").innerHTML = `<div class="flex-center flex-grow-1 gap-2 w-100"><div class="spinner-grow spinner-grow" role="status"><span class="visually-hidden"></span></div>מעדכן...</div>`;
-    rssObj = await Get(url); Get_Data(); Goto_Page('page-main') }
-  catch{ Goto_Page('page-auth')
-  }
+    rssObj = await Get(url); GetData(); GotoPage('page-main') }
+  catch{ GotoPage('page-auth')
+  } 
 }
-function _Read_Key_File(f){
+function _ReadKeyFile(f){
   const file = f.files[0], reader = new FileReader(); reader.readAsText(file);
   reader.onload = () => {
     const pKey = reader.result;
-    url=`https://getpantry.cloud/apiv1/pantry/${pKey}/basket/rss`;
+    url=pKey+"/rss";
     lsRss.url = url; Setls('lsRss'); location.reload();}
 }
-function _Theme_Toggle() {
+function _ThemeToggle() {
   lsRss.theme = document.body.getAttribute("data-bs-theme")=="dark" ? "light" : "dark"
   Setls(); document.body.setAttribute("data-bs-theme", lsRss.theme); 
 }
 
 // DATA
-function Get_Data(){
-  readAll = new Date(); lastRead=rssObj.lastRead; rssFeeds=rssObj.feeds; rssData=rssObj.data
+function GetData(){
+  lastRead=rssObj.lastRead; rssFeeds=rssObj.feeds; rssData=rssObj.data
   rssFeeds.unshift({ id:'0', name:'הצג הכל', url:"#"});
   rssItems = rssData.filter (i => new Date(i.pubDate) > new Date(lastRead));
-  Fill_Feeds(); Fill_Data("#rss-box",rssItems);
+  FillFeeds(); FillData("#rss-box",rssItems);
 }
-function _Get_From_Click() {
+function _GetFromClick() {
   qs(".dropdown-content").classList.toggle("dropdown-show");
 }
-function _Get_Items_From_Time(i){
+function _GetItemsFromTime(i){
   const date = new Date(), fromTime=date.setHours(date.getHours()-i);
   rssItems = rssData.filter (i => new Date(i.pubDate) > fromTime);
-  Fill_Feeds(); Fill_Data("#rss-box",rssItems)
+  FillFeeds(); FillData("#rss-box",rssItems)
 }
-function _Mark_Read_All(){
-  Put(url, {lastRead:rssObj.lastUpdt})
-  rssItems = []; Fill_Feeds()
+async function _MarkRead(){
+  rssObj.lastRead = rssObj.lastUpdt
+  rssItems = []; FillFeeds()
   qs("#rss-box").innerHTML = `<div class='flex-center w-100 h-100 fs-3'>אין פה מה לקרוא</div>`;
+  const res = await Post(url, rssObj)
 }
 
 // FILL ELEMENTS
-function Fill_Feeds(){
+function FillFeeds(){
   qs("#rss-box").innerHTML=""; qs("#rss-feeds").innerHTML=""
   for (s of rssFeeds){
     const newFeed = document.createElement("div")
     let feedCount = s.name=="הצג הכל" ?rssItems.length :rssItems.filter(n => n.site==s.name).length
     feedCount = feedCount==0 ?"" :feedCount
     newFeed.innerHTML = `
-    <div class="d-flex pointer" onclick="_Filter_Feeds('${s.name}')">
+    <div class="d-flex pointer" onclick="_FilterFeeds('${s.name}')">
       <span class="flex-grow-1">${s.name}</span>
       <small class="px-4 text-left text-danger small">${feedCount}</small>
     </div>`
     qs("#rss-feeds").appendChild(newFeed)
   }
 }
-function _Filter_Feeds(site){
+function _FilterFeeds(site){
   SideBar()
   siteRss = site=="הצג הכל" ?rssItems :rssItems.filter(n => n.site==site)
-  Fill_Data("#rss-box",siteRss)
+  FillData("#rss-box",siteRss)
 }
-function Fill_Data(box,itms){
+function FillData(box,itms){
   qs(box).innerHTML = "";
   if (itms.length==0) 
     return qs(box).innerHTML = `<div class='flex-center w-100 h-100 fs-3'>אין פה מה לקרוא</div>`
@@ -119,9 +115,32 @@ function Fill_Data(box,itms){
   })
 }
 
-// ADD FEED
-function _Add_Feed_Show(){
-  SideBar(); 
-  // Modal('new-feed-modal')
-  // qs("#preview-box").innerHTML = ""; Mask('new-feed-modal'); qs("#new-feed-body").classList.toggle("modal-show"); 
+// UPDATE FEEDS
+function _EditFeeds(){
+  SideBar()
+  qs('#jsno-feeds').value = JSON.stringify(rssFeeds.slice(1),undefined,2);
+  GotoPage('page-feeds');
+}
+function _UpdateJson(){
+  try{
+    JSON.parse(qs('#jsno-feeds').value);
+    qs('#json-error').classList.add('d-none'); qs('#save-feeds').classList.remove('d-none'); qs('#jsno-feeds').classList.remove('bg-secondary-subtle'); 
+  }catch{
+    qs('#json-error').classList.remove('d-none'); qs('#save-feeds').classList.add('d-none'); qs('#jsno-feeds').classList.add('bg-secondary-subtle');    
+  }
+}
+function _PritifyJson(){
+  try{
+    const jsonTxt = JSON.parse(qs('#jsno-feeds').value)
+    qs('#jsno-feeds').value = JSON.stringify(jsonTxt,undefined,2)
+  }catch{
+    alert('Json Syntex Error')
+  }
+}
+async function _SaveFeeds(){
+  rssObj.feeds = JSON.parse(qs('#jsno-feeds').value,null,2);
+  qs('#jsno-feeds').value = "Updating... "
+  const res = await Post(url, rssObj)
+  if (res.status==200) qs('#jsno-feeds').value = JSON.stringify(rssObj.feeds,undefined,2);
+  else alert("server connection error")
 }
