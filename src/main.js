@@ -71,9 +71,9 @@ function _GetItemsFromTime(i){
 async function _MarkRead(){
   rssObj.lastRead = rssObj.lastUpdt
   rssItems = []; FillFeeds()
-  qs("#rss-box").innerHTML = `<div class='flex-center w-100 h-100 fs-3'>אין פה מה לקרוא</div>`;
   rssObj.feeds = rssObj.feeds.slice(1);
   const res = await Post(url, rssObj)
+  qs("#rss-box").innerHTML = `<div class='flex-center w-100 h-100 fs-3'>אין פה מה לקרוא</div>`;
 }
 
 // FILL ELEMENTS
