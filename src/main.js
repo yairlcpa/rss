@@ -15,7 +15,7 @@ window.onclick = function(event) { if (!event.target.matches('.dropdown-btn')) q
 const ar = [1,2,4,6,8,10,12,18,24,48]; ar.map(i => qs(".dropdown-content").innerHTML += ` <div class="drop-item border-bottom pointer px-2 py-2" onclick="_GetItemsFromTime(${i})">לפני ${i} שעות</div>`)
 
 // GLOBAL VARIABLES
-let lsRss={}, rssObj={}, rssFeeds, rssItems, lastRead, lastUpdt, url
+let lsRss={}, rssFeeds={}, rssItems={}, feeds, items, lastRead, lastUpdt, url
 
 // API FUNCTIONS
 const Get = async (url) => { const res = await fetch(url); const data = await res.json(); return data; } 
@@ -37,15 +37,15 @@ async function StartApp(){
   lsRss = Getls('lsRss'); url = lsRss.url; document.body.setAttribute("data-bs-theme", lsRss.theme); 
   try{ 
     qs("#rss-box").innerHTML = `<div class="flex-center flex-grow-1 gap-2 w-100"><div class="spinner-grow spinner-grow" role="status"><span class="visually-hidden"></span></div>מעדכן...</div>`;
-    rssObj = await Get(url); GetData(); GotoPage('page-main') }
+    rssItems = await Get(url+"/rss-items"); rssFeeds = await Get(url+"/rss-feeds"); GetData(); GotoPage('page-main') }
   catch{ GotoPage('page-auth')
   } 
 }
 function _ReadKeyFile(f){
   const file = f.files[0], reader = new FileReader(); reader.readAsText(file);
   reader.onload = () => {
-    const pKey = reader.result;
-    url=pKey+"/rss";
+    url = reader.result;
+    // url=pKey+"";
     lsRss.url = url; Setls('lsRss'); location.reload();}
 }
 function _ThemeToggle() {
@@ -55,33 +55,33 @@ function _ThemeToggle() {
 
 // DATA
 function GetData(){
-  lastRead=rssObj.lastRead; rssFeeds=rssObj.feeds; rssData=rssObj.data
-  rssFeeds.unshift({ id:'0', name:'הצג הכל', url:"#"});
-  rssItems = rssData.filter (i => new Date(i.pubDate) > new Date(lastRead));
-  FillFeeds(); FillData("#rss-box",rssItems);
+  feeds = rssFeeds.feeds; data = rssItems.data; lastRead = rssFeeds.lastRead; lastUpdt = rssItems.lastUpdt;
+  feeds.unshift({ id:'0', name:'הצג הכל', url:"#"});
+  items = data.filter (i => new Date(i.pubDate) > new Date(lastRead));
+  FillFeeds(); FillData("#rss-box",items);
 }
 function _GetFromClick() {
   qs(".dropdown-content").classList.toggle("dropdown-show");
 }
 function _GetItemsFromTime(i){
   const date = new Date(), fromTime=date.setHours(date.getHours()-i);
-  rssItems = rssData.filter (i => new Date(i.pubDate) > fromTime);
-  FillFeeds(); FillData("#rss-box",rssItems)
+  items = data.filter (i => new Date(i.pubDate) > fromTime);
+  FillFeeds(); FillData("#rss-box",items)
 }
 async function _MarkRead(){
-  rssObj.lastRead = rssObj.lastUpdt
-  rssItems = []; FillFeeds()
-  rssObj.feeds = rssObj.feeds.slice(1);
-  const res = await Post(url, rssObj)
+  rssFeeds.lastRead = lastUpdt
+  rssFeeds.feeds = feeds.slice(1);
+  items = []; FillFeeds()
+  const res = await Post(url+"/rss-feeds", rssFeeds)
   qs("#rss-box").innerHTML = `<div class='flex-center w-100 h-100 fs-3'>אין פה מה לקרוא</div>`;
 }
 
 // FILL ELEMENTS
 function FillFeeds(){
   qs("#rss-box").innerHTML=""; qs("#rss-feeds").innerHTML=""
-  for (s of rssFeeds){
+  for (const s of feeds){
     const newFeed = document.createElement("div")
-    let feedCount = s.name=="הצג הכל" ?rssItems.length :rssItems.filter(n => n.site==s.name).length
+    let feedCount = s.name=="הצג הכל" ?items.length :items.filter(n => n.site==s.name).length
     feedCount = feedCount==0 ?"" :feedCount
     newFeed.innerHTML = `
     <div class="d-flex pointer" onclick="_FilterFeeds('${s.name}')">
@@ -93,7 +93,7 @@ function FillFeeds(){
 }
 function _FilterFeeds(site){
   SideBar()
-  siteRss = site=="הצג הכל" ?rssItems :rssItems.filter(n => n.site==site)
+  siteRss = site=="הצג הכל" ?items :items.filter(n => n.site==site)
   FillData("#rss-box",siteRss)
 }
 function FillData(box,itms){
@@ -119,7 +119,7 @@ function FillData(box,itms){
 // UPDATE FEEDS
 function _EditFeeds(){
   SideBar()
-  qs('#jsno-feeds').value = JSON.stringify(rssFeeds.slice(1),undefined,2);
+  qs('#jsno-feeds').value = JSON.stringify(feeds.slice(1),undefined,2);
   GotoPage('page-feeds');
 }
 function _UpdateJson(){
@@ -139,9 +139,9 @@ function _PritifyJson(){
   }
 }
 async function _SaveFeeds(){
-  rssObj.feeds = JSON.parse(qs('#jsno-feeds').value,null,2);
+  rssFeeds.feeds = JSON.parse(qs('#jsno-feeds').value,null,2);
   qs('#jsno-feeds').value = "Updating... "
-  const res = await Post(url, rssObj)
-  if (res.status==200) qs('#jsno-feeds').value = JSON.stringify(rssObj.feeds,undefined,2);
+  const res = await Post(url+"/rss-feeds", rssFeeds)
+  if (res.status==200) qs('#jsno-feeds').value = JSON.stringify(rssFeeds.feeds,undefined,2);
   else alert("server connection error")
 }
