@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="theme-color" content="#333">
+  <link rel="manifest" crossorigin="use-credentials" href="manifest.json"/>
+  <link rel="apple-touce-icon" href="./pics/logo192.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">    
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./src/style.css">
+  <script defer src="./src/main.js"></script>
+  <title>Rss</title>
+</head>
+<body data-bs-theme="light"> 
+<div class="app bg-body-tertiary">
+
+<!--- ELEMENTS -->
+<section id="ELEMENTS" class="page">
+  <div id="foo"></div>
+</section>  
+
+<!-- PAGE KEY FILE -->
+<section id="page-key-file" class="page page-hide flex-column">
+  <div class="flex-column flex-center h-100 w-100 gap-3">
+    LOAD KEY FILE
+    <input id="key-file" type="file" class="d-none" accept="text.txt" onchange="Read_Key_File(this)"/>
+    <label for="key-file" class="bi bi-upload px-3 py-3 border rounded-3"></label>
+  </div>`
+</section>
+
+<!-- PAGE MAIN -->
+<section id="page-main" class="page flex-column px-sm-5">
+  <!-- HEADER -->
+  <div class="row px-4">
+    <i class="mt-2 fs-1 fw-bold text-center" style="color: lightslategrey; text-shadow: 2px 2px 4px #000000; scale: 1.4;">MY RSS</i><br>
+    <div id="main-header" class="d-flex justify-content-start align-items-end gap-3">
+      <i class="bi bi-list d-none" title="תפריט" onclick="Toggle_SideBar()"></i>
+      <i class="bi bi-sun" title="תאורה" onclick="Toggle_Theme()"></i>
+      <i class="bi bi-arrow-clockwise" title="עדכן" onclick="location.reload()"></i>
+      <i class="bi bi-check-all" title="סמן כנקרא" onclick="Mark_Read()"></i>
+      <i class="bi bi-pencil px-2" onclick="Edit_Feeds()"></i>
+      <div class="dropdown pt-1">
+        <span onclick="Get_From_Click()" class="dropdown-btn pointer d-flex gap-1 border rounded-2 py-0 px-2 fs-6">
+          זמן...<i class="bi bi-caret-down"></i>
+        </span>
+        <div class="dropdown-content flex-column border rounded-2 bg-body-tertiary"></div>
+      </div>
+    </div>
+  </div>
+  <!-- MAIN -->
+  <div class="d-flex flex-grow-1 overflow-hidden">
+    <!-- SIDEBAR -->
+    <div class="sidebar box border rounded-4 flex-column m-2" style="min-width: 20%;">
+      <div class="fs-3 py-2 border-bottom text-center bg-body-secondary rounded-top-4">פידים</div>
+      <div class="flex-grow-1 d-flex overflow-auto mb-2">    
+        <div id="rss-feeds" class="flex-column gap-1 pt-2 mx-4 flex-grow-1"></div>
+      </div>
+    </div>
+    <!-- RSS BOX -->
+    <div class="box flex-grow-1 border rounded-4 d-flex overflow-y-scroll m-2">
+      <div id="rss-box" class="flex-grow-1 pb-3"></div>
+    </div>
+  </div> 
+</section>
+
+<!-- NEW ITEM TEMLATE --> 
+<template id="new-item">
+  <div id="new-item-~i~" class="d-flex flex-column px-3 my-2 mx-1 mx-sm-4 border border-2 rounded-4 bg-body-secondary">
+    <img id="ti-~i~" class="flex-center rounded rounded-5 py-2 d-none" src="~Img~" style="max-height:250px; max-width:100%;"/>
+    <a href="~Link~" target="_blank">~Title~</a>
+    <div class="d-flex justify-content-between">
+      <small>~Date~</small>
+      <small class="text-truncate">~Site~</small>
+    </div>
+    <div class="d-flex">
+      <h6 class="w-75 ps-3 flex-grow-1" style="font-size:1.1rem">~Text~</h6>
+      <img id="si-~i~" class="flex-center rounded rounded-5 py-2 w-25" src="~Img~"  />
+    </div>
+  </div>
+</template>
+
+<!-- EDIT FEEDS -->
+<section id="page-feeds" class="page page-hide flex-column flex-center justify-content-center gap-3 ltr px-5">
+  <h3>Edit Feeds</h3>
+  <textarea id="json-feeds" class="p-2 mx-2 w-75 rounded-4 text-bg-body" cols="80" rows="20" onkeyup="Update_Json()"></textarea>
+  <div class="d-flex px-2 gap-5 w-100 justify-content-center">
+    <button class="text-bg-secondary rounded-2 poiner" onclick="Start_App()">close</button>
+    <button class="text-bg-success rounded-2 poiner" onclick="Pritify_Json()">pritify</button>
+    <button id="save-feeds" class="text-bg-primary rounded-2 poiner" onclick="Save_Feeds()">save</button>
+    <span id="json-error" class="text-danger fs-bold d-none">Syntex Error</span>
+  </div>
+</section> 
+
+</div>
+</body>
+</html>
