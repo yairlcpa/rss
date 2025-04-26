@@ -133,14 +133,13 @@ const Read_Key_File = (f) => {
 }
 const Start_App = async () => {
   if(window.innerWidth<800) {
-    qs('.sidebar').classList.add('d-none'); qs('.bi-list').classList.remove('d-none'); qs('.bi-pencil').classList.add('d-none'); }
+    qs('.sidebar').classList.add('d-none'); qs('.bi-pencil').classList.add('d-none'); qs('.bi-list').classList.remove('d-none'); }
   if (Getls()==null) {lsRss.theme="light"; Setls()}
   lsRss = Getls(); document.body.setAttribute("data-bs-theme", lsRss.theme); 
   if (lsRss.rssUrl==null) {GotoPage('page-key-file'); return}
   try{ 
     qs("#rss-box").innerHTML = `<div class="flex-center w-100 h-100 fs-3 gap-3"><div class="spinner-grow spinner-grow" role="status"><span class="visually-hidden"></span></div>מעדכן...</div>`;
     const tmp = await Get(lsRss.pantry); lastRead = JSON.parse(tmp).lastRead;
-    // lastRead =  "Sat, 26 Apr 2025 12:03:15 GMT"  //DELETE
     rssObj = JSON.parse(await Get(lsRss.rssUrl)); 
     rssFeeds = rssObj.Feeds; rssData = rssObj.Data; lastUpdt = rssObj.lastUpdt; 
     rssFeeds.unshift({ id:'0', name:'הצג הכל', url:"#"});
