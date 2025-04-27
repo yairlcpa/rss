@@ -13,7 +13,9 @@ window.onclick = function(event) { if (!event.target.matches('.dropdown-btn')) q
 const ar = [1,2,4,6,8,10,12,18,24,48]; ar.map(i => qs(".dropdown-content").innerHTML += ` <div class="drop-item border-bottom pointer px-2 py-2" onclick="Fill_Get_From(${i})">לפני ${i} שעות</div>`)
 
 // API FUNCTIONS
-const Get = async (url) => { const res = await fetch(url); const data = await res.text(); return data; } 
+const Get = async (url) => { 
+  const res = await fetch(url); const data = await res.text(); return data; 
+} 
 const Post = async (url, payload) => {
   const myHeaders = new Headers();  myHeaders.append("Content-Type", "application/json");
   const res = await fetch(url, {method: "POST", body: payload, headers: myHeaders});
@@ -21,11 +23,13 @@ const Post = async (url, payload) => {
 }
 
 // ELEMENTS FUNCTIONS
-const Mask    = (pg) => qs("#"+pg).classList.toggle("mask-show")
+const Mask = (pg) => qs("#"+pg).classList.toggle("mask-show")
 const Toggle_SideBar = () => {
   if (window.innerWidth<800) qsAll('.box').map(i => i.classList.toggle("d-none"))
 }
-const GotoPage = (pg) => { qsAll('.page').map(p =>p.classList.add('page-hide')); qs('#'+pg).classList.remove('page-hide') }
+const GotoPage = (pg) => { 
+  qsAll('.page').map(p =>p.classList.add('page-hide')); qs('#'+pg).classList.remove('page-hide') 
+}
 const Toggle_Theme = () => {
   lsRss.theme = document.body.getAttribute("data-bs-theme")=="dark" ? "light" : "dark"
   Setls(); document.body.setAttribute("data-bs-theme", lsRss.theme); 
@@ -42,9 +46,9 @@ const Fill_Get_From = async (i) => {
 }
 const Mark_Read = async () => {
   const pl = {"lastRead": `${lastUpdt}`}
-  await Post(lsRss.pantry, JSON.stringify(pl))
   rssItems = []; Fill_Feeds();
   qs("#rss-box").innerHTML = `<div class='flex-center w-100 h-100 fs-3'>אין פה מה לקרוא</div>`;
+  await Post(lsRss.pantry, JSON.stringify(pl))
 }
 
 // FILL ELEMENTS
@@ -131,9 +135,12 @@ const Read_Key_File = (f) => {
   catch{
     alert('Key File Error') }
 }
+const Adapt_Mobile = () => {
+  ['.sidebar', '.logo', '.bi-pencil'].forEach(i => qs(i).classList.add('d-none'));
+  qs('.bi-list').classList.remove('d-none'); 
+}
 const Start_App = async () => {
-  if(window.innerWidth<800) {
-    qs('.sidebar').classList.add('d-none'); qs('.bi-pencil').classList.add('d-none'); qs('.bi-list').classList.remove('d-none'); }
+  if(window.innerWidth < 640) Adapt_Mobile();
   if (Getls()==null) {lsRss.theme="light"; Setls()}
   lsRss = Getls(); document.body.setAttribute("data-bs-theme", lsRss.theme); 
   if (lsRss.rssUrl==null) {GotoPage('page-key-file'); return}

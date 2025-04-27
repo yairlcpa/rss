@@ -27,9 +27,8 @@
 <!-- PAGE MAIN -->
 <section id="page-main" class="page flex-column px-sm-5">
   <!-- HEADER -->
-  <div class="row px-4">
-    <i class="mt-2 fs-1 fw-bold text-center" style="color: lightslategrey; text-shadow: 2px 2px 4px #000000; scale: 1.4;">MY RSS</i><br>
-    <div id="main-header" class="d-flex justify-content-start align-items-end gap-3">
+  <header class="d-flex justify-content-between align-items-center pt-2 px-3">
+    <div id="main-header" class="align-self-end d-flex justify-content-start align-items-end gap-3">
       <i class="bi bi-list d-none" title="תפריט" onclick="Toggle_SideBar()"></i>
       <i class="bi bi-sun" title="תאורה" onclick="Toggle_Theme()"></i>
       <i class="bi bi-arrow-clockwise" title="עדכן" onclick="location.reload()"></i>
@@ -42,21 +41,22 @@
         <div class="dropdown-content flex-column border rounded-2 bg-body-tertiary"></div>
       </div>
     </div>
-  </div>
+    <i class="logo mt-2 fs-2 fw-bold text-center" style="color: lightslategrey; text-shadow: 2px 2px 4px #000000; scale: 1.4;">MY RSS</i><br>
+  </header>
   <!-- MAIN -->
-  <div class="d-flex flex-grow-1 overflow-hidden">
+  <main class="d-flex flex-grow-1 gap-3 overflow-hidden my-2">
     <!-- SIDEBAR -->
-    <div class="sidebar box border rounded-4 flex-column m-2" style="min-width: 20%;">
+    <div class="sidebar box border rounded-4 flex-column" style="min-width: 20%;">
       <div class="fs-3 py-2 border-bottom text-center bg-body-secondary rounded-top-4">פידים</div>
       <div class="flex-grow-1 d-flex overflow-auto mb-2">    
         <div id="rss-feeds" class="flex-column gap-1 pt-2 mx-4 flex-grow-1"></div>
       </div>
     </div>
     <!-- RSS BOX -->
-    <div class="box flex-grow-1 border rounded-4 d-flex overflow-y-scroll m-2">
+    <div class="box flex-grow-1 border rounded-4 d-flex overflow-y-scroll">
       <div id="rss-box" class="flex-grow-1 pb-3"></div>
     </div>
-  </div> 
+  </main> 
 </section>
 
 <!-- NEW ITEM TEMLATE --> 
