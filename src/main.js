@@ -13,9 +13,7 @@ window.onclick = function(event) { if (!event.target.matches('.dropdown-btn')) q
 const ar = [1,2,4,6,8,10,12,18,24,48]; ar.map(i => qs(".dropdown-content").innerHTML += ` <div class="drop-item border-bottom pointer px-2 py-2" onclick="Fill_Get_From(${i})">לפני ${i} שעות</div>`)
 
 // API FUNCTIONS
-const Get = async (url) => { 
-  const res = await fetch(url); const data = await res.text(); return data; 
-} 
+const Get = async (url) => { const res = await fetch(url); const data = await res.text(); return data; } 
 const Post = async (url, payload) => {
   const myHeaders = new Headers();  myHeaders.append("Content-Type", "application/json");
   const res = await fetch(url, {method: "POST", body: payload, headers: myHeaders});
@@ -23,13 +21,11 @@ const Post = async (url, payload) => {
 }
 
 // ELEMENTS FUNCTIONS
-const Mask = (pg) => qs("#"+pg).classList.toggle("mask-show")
+const Mask    = (pg) => qs("#"+pg).classList.toggle("mask-show")
 const Toggle_SideBar = () => {
   if (window.innerWidth<800) qsAll('.box').map(i => i.classList.toggle("d-none"))
 }
-const GotoPage = (pg) => { 
-  qsAll('.page').map(p =>p.classList.add('page-hide')); qs('#'+pg).classList.remove('page-hide') 
-}
+const GotoPage = (pg) => { qsAll('.page').map(p =>p.classList.add('page-hide')); qs('#'+pg).classList.remove('page-hide') }
 const Toggle_Theme = () => {
   lsRss.theme = document.body.getAttribute("data-bs-theme")=="dark" ? "light" : "dark"
   Setls(); document.body.setAttribute("data-bs-theme", lsRss.theme); 
@@ -130,7 +126,7 @@ const Read_Key_File = (f) => {
     const file = f.files[0], reader=new FileReader();
     reader.readAsText(file); reader.onload=()=> { 
     const keyFile = JSON.parse(reader.result); 
-    lsRss.rssUrl = keyFile.rssUrl; lsRss.pantry = keyFile.pantry; Setls(); 
+    lsRss.rssData = keyFile.rssData; lsRss.rssItems = keyFile.rssItems; lsRss.pantry = keyFile.pantry; Setls(); 
     location.reload(); }}
   catch{
     alert('Key File Error') }
@@ -143,15 +139,14 @@ const Start_App = async () => {
   if(window.innerWidth < 640) Adapt_Mobile();
   if (Getls()==null) {lsRss.theme="light"; Setls()}
   lsRss = Getls(); document.body.setAttribute("data-bs-theme", lsRss.theme); 
-  if (lsRss.rssUrl==null) {GotoPage('page-key-file'); return}
+  if (lsRss.rssItems==null) {GotoPage('page-key-file'); return}
   try{ 
     qs("#rss-box").innerHTML = `<div class="flex-center w-100 h-100 fs-3 gap-3"><div class="spinner-grow spinner-grow" role="status"><span class="visually-hidden"></span></div>מעדכן...</div>`;
-    const tmp = await Get(lsRss.pantry); lastRead = JSON.parse(tmp).lastRead;
-    rssObj = JSON.parse(await Get(lsRss.rssUrl)); 
-    rssFeeds = rssObj.Feeds; rssData = rssObj.Data; lastUpdt = rssObj.lastUpdt; 
+    rssObj = JSON.parse(await Get(lsRss.rssItems)); 
+    rssFeeds = rssObj.Feeds; rssItems = rssObj.rssItems; lastUpdt = rssObj.lastUpdt; 
     rssFeeds.unshift({ id:'0', name:'הצג הכל', url:"#"});
-    rssItems = rssData.filter(i => (new Date(i.pubDate) > new Date(lastRead)))
-    Fill_Feeds(); Fill_Data("#rss-box",rssItems); GotoPage('page-main') }
+    Fill_Feeds(); Fill_Data("#rss-box",rssItems); GotoPage('page-main') 
+    const {Data} = JSON.parse(await Get(lsRss.rssData)); rssData = Data; }
   catch { 
     qs("#rss-box").innerHTML = `<div class="flex-center w-100 h-100 fs-3">SERVER ERROR</div>` } 
 }
