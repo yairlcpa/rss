@@ -41,7 +41,7 @@ const Fill_Get_From = async (i) => {
   Fill_Feeds(); Fill_Data("#rss-box",rssItems)
 }
 const Mark_Read = async () => {
-  const pl = {"lastRead": `${lastUpdt}`}
+  const pl = {"lastRead": `${lastUpdt}`}; lsRss.lastRead = lastUpdt; Setls();
   rssItems = []; Fill_Feeds();
   qs("#rss-box").innerHTML = `<div class='flex-center w-100 h-100 fs-3'>אין פה מה לקרוא</div>`;
   await Post(lsRss.pantry, JSON.stringify(pl))
@@ -145,6 +145,7 @@ const Start_App = async () => {
     rssObj = JSON.parse(await Get(lsRss.rssItems)); 
     rssFeeds = rssObj.Feeds; rssItems = rssObj.rssItems; lastUpdt = rssObj.lastUpdt; 
     rssFeeds.unshift({ id:'0', name:'הצג הכל', url:"#"});
+    if (lsRss.lastRead == lastUpdt) rssItems=[]
     Fill_Feeds(); Fill_Data("#rss-box",rssItems); GotoPage('page-main') 
     const {Data} = JSON.parse(await Get(lsRss.rssData)); rssData = Data; }
   catch { 
