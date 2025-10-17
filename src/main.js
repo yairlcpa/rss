@@ -43,7 +43,7 @@ const Fill_Get_From = async (i) => {
 const Mark_Read = async () => {
   qs("#rss-box").innerHTML = `<div class="flex-center w-100 h-100 fs-3 gap-3"><div class="spinner-grow spinner-grow" role="status"><span class="visually-hidden"></span></div></div>`;
   const pl = {"lastRead": `${lastUpdt}`}; lsRss.lastRead = lastUpdt; Setls();
-  await Post(lsRss.pantry, JSON.stringify(pl))
+  await Post(lsRss.kvdb, JSON.stringify(pl))
   rssItems = []; Fill_Feeds();
   qs("#rss-box").innerHTML = `<div class='flex-center w-100 h-100 fs-3'>אין פה מה לקרוא</div>`;
 }
@@ -127,7 +127,7 @@ const Read_Key_File = (f) => {
     const file = f.files[0], reader=new FileReader();
     reader.readAsText(file); reader.onload=()=> { 
     const keyFile = JSON.parse(reader.result); 
-    lsRss.rssData = keyFile.rssData; lsRss.rssItems = keyFile.rssItems; lsRss.pantry = keyFile.pantry; Setls(); 
+    lsRss.rssData = keyFile.rssData; lsRss.rssItems = keyFile.rssItems; lsRss.kvdb = keyFile.kvdb; Setls(); 
     location.reload(); }}
   catch{
     alert('Key File Error') }
@@ -154,3 +154,4 @@ const Start_App = async () => {
 }
 
 Start_App()
+
