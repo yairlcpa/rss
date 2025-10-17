@@ -43,7 +43,7 @@ const Fill_Get_From = async (i) => {
 const Mark_Read = async () => {
   qs("#rss-box").innerHTML = `<div class="flex-center w-100 h-100 fs-3 gap-3"><div class="spinner-grow spinner-grow" role="status"><span class="visually-hidden"></span></div></div>`;
   const pl = {"lastRead": `${lastUpdt}`}; lsRss.lastRead = lastUpdt; Setls();
-  await Post(lsRss.kvdb, JSON.stringify(pl))
+  // await Post(lsRss.kvdb, JSON.stringify(pl))
   rssItems = []; Fill_Feeds();
   qs("#rss-box").innerHTML = `<div class='flex-center w-100 h-100 fs-3'>אין פה מה לקרוא</div>`;
 }
@@ -154,4 +154,5 @@ const Start_App = async () => {
 }
 
 Start_App()
+
 
