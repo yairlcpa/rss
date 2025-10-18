@@ -14,6 +14,11 @@ const ar = [1,2,4,6,8,10,12,18,24,48]; ar.map(i => qs(".dropdown-content").inner
 
 // API FUNCTIONS
 const Get = async (url) => { const res = await fetch(url); const data = await res.text(); return data; } 
+const Put = async (url, payload) => {
+  const myHeaders = new Headers();  myHeaders.append("Content-Type", "application/json");
+  const res = await fetch(url, {method: "PUT", body: payload, headers: myHeaders});
+  const data = await res.text(); return data;
+}
 const Post = async (url, payload) => {
   const myHeaders = new Headers();  myHeaders.append("Content-Type", "application/json");
   const res = await fetch(url, {method: "POST", body: payload, headers: myHeaders});
@@ -43,6 +48,7 @@ const Fill_Get_From = async (i) => {
 const Mark_Read = async () => {
   qs("#rss-box").innerHTML = `<div class="flex-center w-100 h-100 fs-3 gap-3"><div class="spinner-grow spinner-grow" role="status"><span class="visually-hidden"></span></div></div>`;
   const pl = {"lastRead": `${lastUpdt}`}; lsRss.lastRead = lastUpdt; Setls();
+  Put(lsRss.jsStorage, JSON.stringify(pl))
   // await Post(lsRss.kvdb, JSON.stringify(pl))
   rssItems = []; Fill_Feeds();
   qs("#rss-box").innerHTML = `<div class='flex-center w-100 h-100 fs-3'>אין פה מה לקרוא</div>`;
@@ -127,7 +133,7 @@ const Read_Key_File = (f) => {
     const file = f.files[0], reader=new FileReader();
     reader.readAsText(file); reader.onload=()=> { 
     const keyFile = JSON.parse(reader.result); 
-    lsRss.rssData = keyFile.rssData; lsRss.rssItems = keyFile.rssItems; lsRss.kvdb = keyFile.kvdb; Setls(); 
+    lsRss.rssData = keyFile.rssData; lsRss.rssItems = keyFile.rssItems; lsRss.jsStorage = keyFile.jsStorage; Setls(); 
     location.reload(); }}
   catch{
     alert('Key File Error') }
@@ -154,5 +160,6 @@ const Start_App = async () => {
 }
 
 Start_App()
+
 
 
